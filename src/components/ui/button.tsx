@@ -4,24 +4,32 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-semibold ring-offset-background transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 select-none',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
-        cityfix: 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm',
-        'cityfix-outline': 'border border-blue-600 text-blue-600 hover:bg-blue-50',
+        default:
+          'bg-primary text-primary-foreground shadow-[0_1px_2px_rgba(0,0,0,0.1),0_1px_0_rgba(255,255,255,0.08)_inset] hover:bg-primary/92 hover:-translate-y-px hover:shadow-[0_2px_8px_rgba(37,99,235,0.3)]',
+        destructive:
+          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:-translate-y-px',
+        outline:
+          'border border-gray-200 bg-white text-gray-700 shadow-[0_1px_2px_rgba(0,0,0,0.06)] hover:bg-gray-50 hover:border-gray-300 hover:-translate-y-px hover:shadow-[0_2px_6px_rgba(0,0,0,0.08)]',
+        secondary:
+          'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
+        ghost:
+          'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900',
+        link:
+          'text-primary underline-offset-4 hover:underline',
+        cityfix:
+          'bg-blue-600 text-white shadow-[0_1px_2px_rgba(0,0,0,0.15),0_4px_12px_rgba(37,99,235,0.25)] hover:bg-blue-500 hover:-translate-y-px hover:shadow-[0_2px_4px_rgba(0,0,0,0.12),0_6px_20px_rgba(37,99,235,0.35)]',
+        'cityfix-outline':
+          'border border-blue-200 bg-blue-50/50 text-blue-700 hover:bg-blue-100 hover:border-blue-300 hover:-translate-y-px',
       },
       size: {
         default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
-        xl: 'h-12 rounded-lg px-10 text-base',
+        sm: 'h-8 rounded-md px-3 text-xs',
+        lg: 'h-11 px-8 text-sm',
+        xl: 'h-12 rounded-xl px-8 text-base',
         icon: 'h-10 w-10',
       },
     },
