@@ -324,10 +324,8 @@ export default function LandingPage() {
       <footer className="border-t bg-gray-950 text-gray-400 py-10">
         <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600">
-              <MapPin className="h-3.5 w-3.5 text-white" />
-            </div>
-            <span className="font-bold text-white text-sm">CityFix AI</span>
+            <img src="/logo.svg" alt="CityFix AI" className="h-8 w-8 object-contain" />
+            <span className="font-black text-white text-sm">CityFix <span className="text-blue-400">AI</span></span>
             <span className="text-xs">· Report once. Route smart. Fix faster.</span>
           </div>
           <p className="text-xs">Built for hackathon demo · Powered by GPT-4o + Next.js + Supabase</p>

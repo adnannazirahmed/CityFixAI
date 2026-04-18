@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MapPin, Menu, X, Shield, MessageSquare, Trophy } from 'lucide-react';
+import { Menu, X, Shield, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -23,11 +23,9 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-sm shadow-sm">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-blue-700">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white">
-            <MapPin className="h-4 w-4" />
-          </div>
-          <span className="text-lg">CityFix AI</span>
+        <Link href="/" className="flex items-center gap-2">
+          <img src="/logo.svg" alt="CityFix AI" className="h-9 w-9 object-contain" />
+          <span className="text-lg font-black text-gray-900">CityFix <span className="text-blue-600">AI</span></span>
         </Link>
 
         {/* Desktop nav */}

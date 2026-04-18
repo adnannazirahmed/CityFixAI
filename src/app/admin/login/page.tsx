@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MapPin, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -61,10 +61,8 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center space-y-2">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-900/50">
-            <MapPin className="h-7 w-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-black text-white">CityFix AI</h1>
+          <img src="/logo.svg" alt="CityFix AI" className="mx-auto h-20 w-20 object-contain" />
+          <h1 className="text-2xl font-black text-white">CityFix <span className="text-blue-400">AI</span></h1>
           <p className="text-gray-400 text-sm">Admin Console</p>
         </div>
 
