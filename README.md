@@ -8,6 +8,8 @@
 
 <p><strong>Report once. Route smart. Fix faster.</strong></p>
 
+<p>Built in 24 hours by <a href="https://github.com/adnannazirahmed">@adnannazirahmed</a> · <a href="https://github.com/mshirish">@mshirish</a> · <a href="https://github.com/Rjshrestha">@Rjshrestha</a></p>
+
 <p>An AI-powered civic platform that turns resident photos into intelligent, prioritized work orders —<br/>so cities fix the <em>right</em> problems first.</p>
 
 <br/>
