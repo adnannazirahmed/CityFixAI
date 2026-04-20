@@ -2,7 +2,7 @@
 
 <br/>
 
-<img src="public/cityfix-logo.png" alt="CityFix AI" width="80" />
+<img src="public/logo.svg" alt="CityFix AI" width="80" />
 
 <h1>CityFix AI</h1>
 
