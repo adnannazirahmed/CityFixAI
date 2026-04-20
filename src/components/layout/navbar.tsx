@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Shield, MessageSquare } from 'lucide-react';
+import { Menu, X, Shield, MessageSquare, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -25,7 +25,9 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <img src="/logo.svg" alt="CityFix AI" className="h-9 w-9 object-contain transition-transform duration-200 group-hover:scale-105" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">
+            <MapPin className="h-4 w-4" />
+          </div>
           <span className="text-[15px] font-black tracking-tight text-gray-900">
             CityFix <span className="text-blue-600">AI</span>
           </span>

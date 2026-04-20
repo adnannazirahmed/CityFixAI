@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
     // 3. Duplicate detection
     const { data: existingReports } = await supabase
       .from('reports')
-      .select('id, category, latitude, longitude, status')
+      .select('id, category, latitude, longitude, status, duplicate_cluster_id')
       .neq('status', 'resolved');
 
     const duplicates = findDuplicates(

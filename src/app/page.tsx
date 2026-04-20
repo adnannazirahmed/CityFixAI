@@ -363,7 +363,9 @@ export default function LandingPage() {
       <footer className="border-t border-gray-900 bg-[#080e1f] text-gray-500 py-10">
         <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <img src="/logo.svg" alt="CityFix AI" className="h-7 w-7 object-contain opacity-90" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600">
+              <MapPin className="h-3.5 w-3.5 text-white" />
+            </div>
             <span className="font-black text-gray-200 text-sm tracking-tight">
               CityFix <span className="text-blue-400">AI</span>
             </span>

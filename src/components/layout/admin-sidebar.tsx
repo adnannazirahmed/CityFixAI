@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  LayoutDashboard, FileText, BarChart3,
+  LayoutDashboard, FileText, BarChart3, MapPin,
   LogOut, Settings, AlertTriangle, Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,7 +32,9 @@ export function AdminSidebar() {
     <aside className="flex h-full w-64 flex-col bg-gray-950 text-white">
       {/* Brand */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-800">
-        <img src="/logo.svg" alt="CityFix AI" className="h-10 w-10 object-contain rounded-lg" />
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600">
+            <MapPin className="h-4 w-4 text-white" />
+          </div>
         <div>
           <p className="font-black text-sm tracking-wide">CityFix <span className="text-blue-400">AI</span></p>
           <p className="text-xs text-gray-400">Admin Console</p>

@@ -76,9 +76,6 @@ CREATE INDEX IF NOT EXISTS idx_reports_category        ON reports(category);
 CREATE INDEX IF NOT EXISTS idx_reports_neighborhood    ON reports(neighborhood);
 CREATE INDEX IF NOT EXISTS idx_reports_cluster         ON reports(duplicate_cluster_id);
 CREATE INDEX IF NOT EXISTS idx_reports_created         ON reports(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_reports_location        ON reports USING gist (
-  ll_to_earth(latitude, longitude)
-);
 CREATE INDEX IF NOT EXISTS idx_status_history_report   ON report_status_history(report_id);
 
 -- ─── Updated_at auto-update trigger ──────────────────────────────────────────
