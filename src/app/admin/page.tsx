@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { formatRelativeTime, getStatusLabel } from '@/lib/utils';
 import { DEMO_STATS } from '@/lib/demo-data';
 import type { Report, DashboardStats, ReportStatus, CategoryChartData, TrendChartData } from '@/types';
+import { apiFetch } from '@/lib/demo/browser-store';
 
 const CATEGORY_COLORS: Record<string, string> = {
   pothole: '#EF4444',
@@ -70,8 +71,8 @@ export default function AdminDashboardPage() {
   async function fetchData() {
     try {
       const [reportsRes, insightsRes] = await Promise.all([
-        fetch('/api/reports?limit=100'),
-        fetch('/api/insights'),
+        apiFetch('/api/reports?limit=100'),
+        apiFetch('/api/insights'),
       ]);
       const [reportsData, insightsData] = await Promise.all([
         reportsRes.json(),
@@ -92,7 +93,7 @@ export default function AdminDashboardPage() {
 
   async function handleStatusChange(id: string, status: ReportStatus) {
     try {
-      const res = await fetch(`/api/reports/${id}`, {
+      const res = await apiFetch(`/api/reports/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

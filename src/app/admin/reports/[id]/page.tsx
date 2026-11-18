@@ -20,6 +20,7 @@ import { formatDateTime, formatRelativeTime, getCategoryIcon, getCategoryLabel, 
 import { DEMO_REPORTS } from '@/lib/demo-data';
 import { getDepartmentByInternalCategory, DEPARTMENT_LABELS } from '@/data/seeclickfix-categories';
 import type { Report, ReportStatus } from '@/types';
+import { apiFetch } from '@/lib/demo/browser-store';
 
 const IssueMap = dynamic(
   () => import('@/components/map/issue-map').then((m) => m.IssueMap),
@@ -46,7 +47,7 @@ export default function AdminReportDetailPage() {
       return;
     }
 
-    fetch(`/api/reports/${id}`)
+    apiFetch(`/api/reports/${id}`)
       .then((r) => r.json())
       .then((d) => { if (d.data) setReport(d.data); })
       .catch(() => toast.error('Failed to load report'))
@@ -57,7 +58,7 @@ export default function AdminReportDetailPage() {
     if (!report) return;
     setUpdating(true);
     try {
-      const res = await fetch(`/api/reports/${id}`, {
+      const res = await apiFetch(`/api/reports/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, note }),

@@ -4,8 +4,8 @@ import { Trophy, Target, Star, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import type { UserScore } from '@/lib/user-store';
-import { BADGES } from '@/lib/user-store';
+import type { UserScore } from '@/lib/scoring/user-score';
+import { BADGES } from '@/lib/scoring/user-score';
 
 interface UserScoreCardProps {
   score: UserScore;

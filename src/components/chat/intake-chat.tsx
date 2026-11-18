@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DEPARTMENT_LABELS } from '@/data/seeclickfix-categories';
 import type { ChatMessage, IntakeData } from '@/lib/openai/intake-chat';
+import { apiFetch } from '@/lib/demo/browser-store';
 
 interface DisplayMessage {
   id: string;
@@ -53,7 +54,7 @@ export function IntakeChat() {
   async function callAI(history: ChatMessage[], lang: string) {
     setLoading(true);
     try {
-      const res = await fetch('/api/chat', {
+      const res = await apiFetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: history, language: lang }),
@@ -129,7 +130,7 @@ export function IntakeChat() {
     } catch { /* use default */ }
 
     try {
-      const res = await fetch('/api/reports', {
+      const res = await apiFetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description: intake.description_en, latitude: lat, longitude: lng, image_url: photoDataUrl }),

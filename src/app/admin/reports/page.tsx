@@ -8,13 +8,14 @@ import { toast } from 'sonner';
 import { DEMO_REPORTS } from '@/lib/demo-data';
 import { getStatusLabel } from '@/lib/utils';
 import type { Report, ReportStatus } from '@/types';
+import { apiFetch } from '@/lib/demo/browser-store';
 
 export default function AdminReportsPage() {
   const [reports, setReports] = useState<Report[]>(DEMO_REPORTS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/reports?limit=200')
+    apiFetch('/api/reports?limit=200')
       .then((r) => r.json())
       .then((d) => { if (d.data) setReports(d.data); })
       .catch(() => {/* keep demo data */})
@@ -23,7 +24,7 @@ export default function AdminReportsPage() {
 
   async function handleStatusChange(id: string, status: ReportStatus) {
     try {
-      const res = await fetch(`/api/reports/${id}`, {
+      const res = await apiFetch(`/api/reports/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),

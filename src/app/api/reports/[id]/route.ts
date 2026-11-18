@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
 import { store } from '@/lib/store';
-import { userStore } from '@/lib/user-store';
 import type { ReportStatus } from '@/types';
 
 import { IS_DEMO } from '@/lib/demo/config';
+
+// Never prerender at build time: this reads live (Supabase or in-memory) data.
+export const dynamic = 'force-dynamic';
 
 // ─── GET /api/reports/:id ─────────────────────────────────────────────────────
 export async function GET(
@@ -56,12 +58,13 @@ export async function PATCH(
     }
 
     if (IS_DEMO) {
-      const updated = store.updateStatus(params.id, status);
-      // Award resolution points to the original reporter
-      if (status === 'resolved' && updated?.user_id) {
-        userStore.recordResolution(updated.user_id);
-      }
-      return NextResponse.json({ data: updated ?? { id: params.id, status }, error: null });
+      // Read-only in demo mode: return the would-be update without mutating anything.
+      // The visitor's browser stores the override and any resolution points.
+      const seed = store.getById(params.id);
+      const updated = seed
+        ? { ...seed, status, updated_at: new Date().toISOString() }
+        : { id: params.id, status };
+      return NextResponse.json({ data: updated, error: null });
     }
 
     const supabase = await createServiceClient();

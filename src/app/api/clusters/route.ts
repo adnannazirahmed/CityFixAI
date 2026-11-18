@@ -4,6 +4,9 @@ import { DEMO_CLUSTERS } from '@/lib/demo-data';
 
 import { IS_DEMO } from '@/lib/demo/config';
 
+// Never prerender at build time: this reads live (Supabase or in-memory) data.
+export const dynamic = 'force-dynamic';
+
 // ─── GET /api/clusters ────────────────────────────────────────────────────────
 export async function GET() {
   if (IS_DEMO) {

@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Navbar } from '@/components/layout/navbar';
 import { UserScoreCard } from '@/components/shared/user-score-card';
-import type { UserScore } from '@/lib/user-store';
+import type { UserScore } from '@/lib/scoring/user-score';
+import { apiFetch } from '@/lib/demo/browser-store';
 
 function SuccessContent() {
   const params = useSearchParams();
@@ -17,7 +18,7 @@ function SuccessContent() {
 
   useEffect(() => {
     if (!uid) return;
-    fetch(`/api/users/${uid}`)
+    apiFetch(`/api/users/${uid}`)
       .then(r => r.json())
       .then(d => { if (d.data) setUserScore(d.data); })
       .catch(() => {});

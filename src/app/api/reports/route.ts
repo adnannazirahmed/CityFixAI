@@ -3,11 +3,13 @@ import { createServiceClient } from '@/lib/supabase/server';
 import { analyzeReport } from '@/lib/openai/analyze';
 import { calculatePriorityScore, findDuplicates } from '@/lib/scoring/priority';
 import { store } from '@/lib/store';
-import { userStore } from '@/lib/user-store';
 import { scoreToLevel } from '@/lib/utils';
 import type { IssueCategory, Report } from '@/types';
 
 import { IS_DEMO } from '@/lib/demo/config';
+
+// Never prerender at build time: this reads live (Supabase or in-memory) data.
+export const dynamic = 'force-dynamic';
 
 // ─── GET /api/reports ─────────────────────────────────────────────────────────
 export async function GET(request: NextRequest) {
@@ -101,18 +103,14 @@ export async function POST(request: NextRequest) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-      store.add(newReport);
+      // Demo mode is read-only on the server: nothing is stored here. The visitor's
+      // browser persists the report and applies scoreEvent (src/lib/demo/browser-store.ts).
+      const scoreEvent = {
+        confidence: aiResult.confidence,
+        mismatch_detected: aiResult.mismatch_detected,
+      };
 
-      // Update user score
-      const userScore = user_id
-        ? userStore.recordReport(user_id, {
-            type: 'report_submitted',
-            confidence: aiResult.confidence,
-            mismatch_detected: aiResult.mismatch_detected,
-          })
-        : null;
-
-      return NextResponse.json({ data: newReport, userScore, error: null }, { status: 201 });
+      return NextResponse.json({ data: newReport, scoreEvent, error: null }, { status: 201 });
     }
 
     const supabase = await createServiceClient();

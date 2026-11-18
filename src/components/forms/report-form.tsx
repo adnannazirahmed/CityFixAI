@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { getCategoryLabel, getScoreColor } from '@/lib/utils';
 import type { AIAnalysisResult } from '@/types';
+import { apiFetch } from '@/lib/demo/browser-store';
 
 const schema = z.object({
   description: z.string().min(10, 'Please provide at least 10 characters').max(1000),
@@ -196,7 +197,7 @@ export function ReportForm() {
       setImageUrl(compressedDataUrl);
 
       // AI analysis preview — send compressed base64 directly, no upload needed
-      const analyzeRes = await fetch('/api/ai/analyze', {
+      const analyzeRes = await apiFetch('/api/ai/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description: data.description, image_url: compressedDataUrl }),
@@ -228,7 +229,7 @@ export function ReportForm() {
     }
 
     try {
-      const res = await fetch('/api/reports', {
+      const res = await apiFetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

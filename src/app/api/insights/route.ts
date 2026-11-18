@@ -5,6 +5,9 @@ import { calculateEquityScore } from '@/lib/scoring/priority';
 
 import { IS_DEMO } from '@/lib/demo/config';
 
+// Never prerender at build time: this reads live (Supabase or in-memory) data.
+export const dynamic = 'force-dynamic';
+
 // ─── GET /api/insights ────────────────────────────────────────────────────────
 export async function GET() {
   if (IS_DEMO) {

@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Navbar } from '@/components/layout/navbar';
-import { BADGES } from '@/lib/user-store';
-import type { UserScore } from '@/lib/user-store';
+import { BADGES } from '@/lib/scoring/user-score';
+import type { UserScore } from '@/lib/scoring/user-score';
+import { apiFetch } from '@/lib/demo/browser-store';
 
 const RANK_COLORS = ['text-yellow-500', 'text-gray-400', 'text-amber-600'];
 const RANK_BG = ['bg-yellow-50 border-yellow-200', 'bg-gray-50 border-gray-200', 'bg-amber-50 border-amber-200'];
@@ -28,7 +29,7 @@ export default function LeaderboardPage() {
   );
 
   useEffect(() => {
-    fetch('/api/leaderboard')
+    apiFetch('/api/leaderboard')
       .then(r => r.json())
       .then(d => { setLeaders(d.data ?? []); setLoading(false); })
       .catch(() => setLoading(false));

@@ -12,6 +12,7 @@ import { PriorityBadge } from '@/components/shared/priority-badge';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { getCategoryLabel, getCategoryIcon, formatRelativeTime } from '@/lib/utils';
 import type { Report, PriorityLevel } from '@/types';
+import { apiFetch } from '@/lib/demo/browser-store';
 
 // Dynamic import — Leaflet requires browser APIs
 const IssueMap = dynamic(
@@ -34,7 +35,7 @@ export default function MapPage() {
   const [selected, setSelected] = useState<Report | null>(null);
 
   useEffect(() => {
-    fetch('/api/reports?limit=200')
+    apiFetch('/api/reports?limit=200')
       .then((r) => r.json())
       .then((d) => setReports(d.data ?? []))
       .finally(() => setLoading(false));
