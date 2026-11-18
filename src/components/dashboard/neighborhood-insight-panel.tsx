@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Brain, RefreshCw, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ export function NeighborhoodInsightPanel({ neighborhood }: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [generatedAt, setGeneratedAt] = useState<string>('');
 
-  async function fetchInsight() {
+  const fetchInsight = useCallback(async () => {
     try {
       const res = await fetch('/api/ai/neighborhood-insight', {
         method: 'POST',
@@ -34,9 +34,9 @@ export function NeighborhoodInsightPanel({ neighborhood }: Props) {
       setLoading(false);
       setRefreshing(false);
     }
-  }
+  }, [neighborhood]);
 
-  useEffect(() => { fetchInsight(); }, [neighborhood]);
+  useEffect(() => { fetchInsight(); }, [fetchInsight]);
 
   const handleRefresh = () => {
     setRefreshing(true);

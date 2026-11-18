@@ -4,14 +4,14 @@ import { store } from '@/lib/store';
 import { userStore } from '@/lib/user-store';
 import type { ReportStatus } from '@/types';
 
-const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+import { IS_DEMO } from '@/lib/demo/config';
 
 // ─── GET /api/reports/:id ─────────────────────────────────────────────────────
 export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (DEMO_MODE || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (IS_DEMO) {
     const report = store.getById(params.id);
     if (!report) return NextResponse.json({ data: null, error: 'Not found' }, { status: 404 });
     return NextResponse.json({ data: report, error: null });
@@ -55,7 +55,7 @@ export async function PATCH(
       return NextResponse.json({ data: null, error: 'Invalid status' }, { status: 400 });
     }
 
-    if (DEMO_MODE || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    if (IS_DEMO) {
       const updated = store.updateStatus(params.id, status);
       // Award resolution points to the original reporter
       if (status === 'resolved' && updated?.user_id) {
@@ -103,7 +103,7 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  if (DEMO_MODE || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (IS_DEMO) {
     return NextResponse.json({ data: { id: params.id }, error: null });
   }
 

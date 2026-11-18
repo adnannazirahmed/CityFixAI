@@ -3,11 +3,11 @@ import { createServiceClient } from '@/lib/supabase/server';
 import { DEMO_INSIGHTS, DEMO_STATS, DEMO_REPORTS } from '@/lib/demo-data';
 import { calculateEquityScore } from '@/lib/scoring/priority';
 
-const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+import { IS_DEMO } from '@/lib/demo/config';
 
 // ─── GET /api/insights ────────────────────────────────────────────────────────
 export async function GET() {
-  if (DEMO_MODE || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (IS_DEMO) {
     return NextResponse.json({
       data: {
         stats: DEMO_STATS,

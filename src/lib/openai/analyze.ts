@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { aiEnabled } from '@/lib/demo/config';
 import { z } from 'zod';
 import type { AIAnalysisResult, IssueCategory } from '@/types';
 
@@ -130,13 +131,11 @@ export async function analyzeReport(
   lat?: number | null,
   lng?: number | null,
 ): Promise<AIAnalysisResult> {
-  const apiKey = process.env.OPENAI_API_KEY;
-
-  if (!apiKey || apiKey.startsWith('sk-placeholder')) {
+  if (!aiEnabled()) {
     return generateFallbackAnalysis(description || 'civic issue reported');
   }
 
-  const client = new OpenAI({ apiKey });
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const contextString = buildContextString(lat, lng);
 
   const userContent: OpenAI.Chat.ChatCompletionContentPart[] = [];

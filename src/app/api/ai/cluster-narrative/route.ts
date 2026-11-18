@@ -5,7 +5,7 @@ import { createServiceClient } from '@/lib/supabase/server';
 import { getCategoryLabel } from '@/lib/utils';
 import type { IssueCategory } from '@/types';
 
-const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+import { IS_DEMO, aiEnabled } from '@/lib/demo/config';
 
 // ─── POST /api/ai/cluster-narrative ──────────────────────────────────────────
 // Returns an AI-generated narrative for duplicate clusters
@@ -14,7 +14,7 @@ export async function POST(_request: NextRequest) {
     // Load cluster data
     let clusters: { id: string; category: IssueCategory; cluster_size: number; neighborhood: string | null; status: string; created_at: string }[] = [];
 
-    if (DEMO_MODE || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    if (IS_DEMO) {
       // Synthesize clusters from in-memory store by grouping nearby same-category reports
       const reports = store.getAll({ limit: 200 });
       const grouped: Record<string, typeof reports> = {};
@@ -48,10 +48,8 @@ export async function POST(_request: NextRequest) {
       return NextResponse.json({ data: { narratives: [] }, error: null });
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
-
     // Build narratives — with or without GPT
-    if (!apiKey || apiKey.startsWith('sk-placeholder')) {
+    if (!aiEnabled()) {
       const narratives = clusters.map(c => ({
         cluster_id: c.id,
         category: c.category,
@@ -62,7 +60,7 @@ export async function POST(_request: NextRequest) {
       return NextResponse.json({ data: { narratives }, error: null });
     }
 
-    const client = new OpenAI({ apiKey });
+    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     // One GPT call with all clusters listed — more efficient than N calls
     const clusterList = clusters

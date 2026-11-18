@@ -12,6 +12,8 @@ interface IssueMapProps {
   onMarkerClick?: (id: string) => void;
 }
 
+type MarkerClickWindow = Window & { __mapMarkerClick?: (id: string) => void };
+
 function buildIconHtml(color: string): string {
   return `<div style="
     width: 32px; height: 32px;
@@ -46,14 +48,12 @@ export function IssueMap({
     if (!mapRef.current) return;
     // Leaflet stamps _leaflet_id on the container when initialized.
     // In React StrictMode effects run twice — bail out if already stamped.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((mapRef.current as any)._leaflet_id) return;
+    if ((mapRef.current as HTMLDivElement & { _leaflet_id?: number })._leaflet_id) return;
 
     // Dynamically import Leaflet to avoid SSR issues
     import('leaflet').then((L) => {
       // Fix default icon URLs for webpack
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
+      delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
         iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -117,8 +117,7 @@ export function IssueMap({
 
       // Expose click handler globally for popup buttons
       if (onMarkerClick) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window as any).__mapMarkerClick = onMarkerClick;
+        (window as MarkerClickWindow).__mapMarkerClick = onMarkerClick;
       }
 
       // Fit bounds if we have markers
@@ -130,12 +129,10 @@ export function IssueMap({
 
     return () => {
       if (mapInstanceRef.current) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (mapInstanceRef.current as any).remove();
+        (mapInstanceRef.current as { remove: () => void }).remove();
         mapInstanceRef.current = null;
         markersRef.current = [];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        delete (window as any).__mapMarkerClick;
+        delete (window as MarkerClickWindow).__mapMarkerClick;
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
 import { DEMO_CLUSTERS } from '@/lib/demo-data';
 
-const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+import { IS_DEMO } from '@/lib/demo/config';
 
 // ─── GET /api/clusters ────────────────────────────────────────────────────────
 export async function GET() {
-  if (DEMO_MODE || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (IS_DEMO) {
     return NextResponse.json({ data: DEMO_CLUSTERS, error: null });
   }
 

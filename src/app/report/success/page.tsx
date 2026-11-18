@@ -38,7 +38,7 @@ function SuccessContent() {
             <h1 className="text-3xl font-black text-gray-900">Report Submitted!</h1>
             <p className="text-gray-500">
               Thank you for helping make Worcester better. Your report has been analyzed by AI
-              and added to the city's priority queue.
+              and added to the city&apos;s priority queue.
             </p>
           </div>
         </div>

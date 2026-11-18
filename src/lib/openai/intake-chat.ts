@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { aiEnabled } from '@/lib/demo/config';
 import { findCategoryByKeywords, SEECLICKFIX_CATEGORIES } from '@/data/seeclickfix-categories';
 import type { SeeClickFixCategory, Department } from '@/data/seeclickfix-categories';
 import type { IssueCategory } from '@/types';
@@ -187,13 +188,11 @@ function generateFallbackResponse(messages: ChatMessage[], language: string): Ch
 
 // ─── Main export ──────────────────────────────────────────────────────────────
 export async function processMessage(messages: ChatMessage[], language = 'en'): Promise<ChatResponse> {
-  const apiKey = process.env.OPENAI_API_KEY;
-
-  if (!apiKey || apiKey.startsWith('sk-placeholder')) {
+  if (!aiEnabled()) {
     return generateFallbackResponse(messages, language);
   }
 
-  const client = new OpenAI({ apiKey });
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   try {
     const response = await client.chat.completions.create({

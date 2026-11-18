@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/server';
+import { IS_DEMO } from '@/lib/demo/config';
 
 // ─── POST /api/upload ─────────────────────────────────────────────────────────
 export async function POST(request: NextRequest) {
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // In demo mode, return the actual image as a base64 data URL so the AI can analyze the real photo
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+    if (IS_DEMO) {
       const bytes = await file.arrayBuffer();
       const base64 = Buffer.from(bytes).toString('base64');
       const dataUrl = `data:${file.type};base64,${base64}`;

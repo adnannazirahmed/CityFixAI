@@ -156,6 +156,7 @@ export interface DuplicateCandidate {
   latitude: number;
   longitude: number;
   status: string;
+  duplicate_cluster_id?: string | null;
 }
 
 export function findDuplicates(

@@ -5,9 +5,9 @@ import { calculatePriorityScore, findDuplicates } from '@/lib/scoring/priority';
 import { store } from '@/lib/store';
 import { userStore } from '@/lib/user-store';
 import { scoreToLevel } from '@/lib/utils';
-import type { IssueCategory } from '@/types';
+import type { IssueCategory, Report } from '@/types';
 
-const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+import { IS_DEMO } from '@/lib/demo/config';
 
 // ─── GET /api/reports ─────────────────────────────────────────────────────────
 export async function GET(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
   const priority_level = searchParams.get('priority_level');
   const limit = parseInt(searchParams.get('limit') ?? '100');
 
-  if (DEMO_MODE || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  if (IS_DEMO) {
     const data = store.getAll({ status: status ?? undefined, category: category ?? undefined, neighborhood: neighborhood ?? undefined, priority_level: priority_level ?? undefined, limit });
     return NextResponse.json({ data, error: null });
   }
@@ -89,12 +89,12 @@ export async function POST(request: NextRequest) {
       priority_level: scoreToLevel(finalPriority),
       ai_reasoning: aiResult.reasoning,
       recommended_action: aiResult.recommended_action,
-      status: 'submitted',
+      status: 'submitted' as const,
       duplicate_cluster_id: null,
     };
 
-    if (DEMO_MODE || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      const newReport = {
+    if (IS_DEMO) {
+      const newReport: Report = {
         id: `report-${Date.now()}`,
         ...reportData,
         user_id: user_id ?? null,
