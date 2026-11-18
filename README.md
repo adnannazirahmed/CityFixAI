@@ -12,6 +12,8 @@
 
 <p>An AI-powered civic platform that turns resident photos into intelligent, prioritized work orders —<br/>so cities fix the <em>right</em> problems first.</p>
 
+<p><strong>Live demo:</strong> <a href="https://YOUR-DEMO-URL.vercel.app">https://YOUR-DEMO-URL.vercel.app</a> <em>(sample data, simulated AI — see <a href="#whats-real-vs-simulated-in-the-demo">what's real vs simulated</a>)</em></p>
+
 <br/>
 
 [![Next.js](https://img.shields.io/badge/Next.js_14-black?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
@@ -147,13 +149,16 @@ npm install
 NEXT_PUBLIC_DEMO_MODE=true npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — fully functional with **25 pre-loaded reports, 4 issue clusters, equity heatmap, and full analytics**.
+Open [http://localhost:3000](http://localhost:3000) — fully functional with **35 sample reports, 5 duplicate clusters, equity heatmap, and full analytics**.
+
+Admin: click **Enter demo dashboard** on `/admin/login` (one-click login in demo mode), or sign in with:
 
 ```
-Admin login
-  Email:    admin@cityfix.ai
-  Password: cityfix-admin-2024
+Email:    admin@cityfix.ai
+Password: cityfix-admin-2024
 ```
+
+A banner at the top of every page links to a guided tour and a **Reset demo** button.
 
 ### Demo walkthrough
 
@@ -162,9 +167,26 @@ Admin login
 3. `/chat` — Try multilingual AI chat reporting
 4. `/map` — Explore all open issues on the map
 5. `/leaderboard` — Community contributor scores
-6. `/admin` — Full prioritized dashboard (use credentials above)
+6. `/admin` — Full prioritized dashboard (one-click demo login)
 7. `/admin/reports` — Filter, sort, update statuses
 8. `/admin/analytics` — Equity heatmap, trend charts, cluster narratives
+
+### What's real vs simulated in the demo
+
+With `NEXT_PUBLIC_DEMO_MODE=true` the app runs with no database and no API keys.
+
+| Area | In the demo |
+|---|---|
+| UI, routing, map, charts, leaderboard | **Real**: the same code as production |
+| Priority scoring, duplicate/equity logic, badges, contributor scores | **Real**: same algorithms, run on demo data |
+| Report data | **Sample**: 35 hand-written reports and 5 clusters for Worcester, MA ([`src/lib/demo-data.ts`](src/lib/demo-data.ts)) |
+| Photo/description analysis (`/report`) | **Simulated**: keyword rules on the description; photos are not analyzed |
+| Chat intake (`/chat`) | **Simulated**: scripted, rule-based replies. Full script in English, Spanish and Portuguese; other languages get a translated greeting, then English replies |
+| Neighborhood insights and cluster narratives | **Simulated**: templated text |
+| Your submissions, status changes and score | **Stored only in your browser** (`localStorage`). The server is read-only, so every visitor starts from the same sample data |
+| Admin login | **Real signed session** (HMAC cookie), with a one-click demo login |
+
+Demo mode never calls OpenAI, even if `OPENAI_API_KEY` is set.
 
 ---
 
@@ -188,6 +210,7 @@ OPENAI_API_KEY=sk-...
 # Admin auth
 ADMIN_EMAIL=admin@yourorg.com
 ADMIN_PASSWORD=your_secure_password
+ADMIN_SESSION_SECRET=long-random-string   # signs the admin session cookie (required outside demo mode)
 
 # Demo mode — set false for production
 NEXT_PUBLIC_DEMO_MODE=false
@@ -220,31 +243,49 @@ npm start        # production server
 ## Project Structure
 
 ```
-cityfix-ai/
+CityFixAI/
 ├── src/
+│   ├── middleware.ts                 # Guards /admin/* and report mutations (signed session)
 │   ├── app/
 │   │   ├── page.tsx                  # Landing page
-│   │   ├── report/                   # Resident report flow
-│   │   ├── chat/                     # Multilingual AI chat
+│   │   ├── report/                   # Resident report flow (+ success page)
+│   │   ├── chat/                     # Multilingual chat intake
 │   │   ├── map/                      # Public issue map
 │   │   ├── leaderboard/              # Community leaderboard
-│   │   └── admin/                    # Dashboard, analytics, reports
-│   ├── app/api/
-│   │   ├── reports/                  # CRUD for issue reports
-│   │   ├── analyze/                  # GPT-4o Vision pipeline
-│   │   ├── cluster/                  # Duplicate detection engine
-│   │   ├── insights/                 # AI neighborhood narratives
-│   │   └── upload/                   # Image storage
+│   │   ├── admin/                    # Login, dashboard, reports, analytics
+│   │   └── api/
+│   │       ├── reports/              # List/create reports; [id] get/update/delete
+│   │       ├── ai/analyze/           # GPT-4o Vision report analysis
+│   │       ├── ai/cluster-narrative/ # AI narratives for duplicate clusters
+│   │       ├── ai/neighborhood-insight/  # AI neighborhood situation report
+│   │       ├── chat/                 # Chat intake turn handler
+│   │       ├── clusters/             # Duplicate clusters
+│   │       ├── insights/             # Dashboard stats + equity insights
+│   │       ├── leaderboard/          # Top contributors
+│   │       ├── users/[id]/           # Contributor score
+│   │       ├── upload/               # Image upload (Supabase Storage)
+│   │       └── admin/login/          # Admin login / logout / session check
 │   ├── components/
-│   │   ├── dashboard/                # Stats cards, charts, heatmap
+│   │   ├── dashboard/                # Stats cards, charts, heatmap, AI panels
 │   │   ├── forms/                    # Report submission form
 │   │   ├── map/                      # Leaflet map
-│   │   ├── chat/                     # AI intake chat
-│   │   └── shared/                   # Priority badges, AI cards
+│   │   ├── chat/                     # Intake chat UI
+│   │   ├── layout/                   # Navbar, admin sidebar, demo banner
+│   │   ├── shared/                   # Priority/status badges, AI and score cards
+│   │   └── ui/                       # shadcn/ui primitives
+│   ├── data/
+│   │   └── seeclickfix-categories.ts # Categories, departments, SLAs, keywords
 │   └── lib/
-│       ├── openai.ts                 # GPT-4o Vision integration
-│       ├── priority-scoring.ts       # Weighted scoring algorithm
-│       ├── demo-data.ts              # 25-report demo dataset
+│       ├── openai/analyze.ts         # GPT-4o Vision analysis (+ rule-based fallback)
+│       ├── openai/intake-chat.ts     # Chat intake (+ scripted fallback)
+│       ├── scoring/priority.ts       # Priority scoring, duplicates, equity
+│       ├── scoring/user-score.ts     # Contributor scores and badges (client-safe)
+│       ├── auth/session.ts           # HMAC-signed admin session tokens
+│       ├── demo/config.ts            # IS_DEMO, aiEnabled(), demo admin credentials
+│       ├── demo/browser-store.ts     # Demo: per-visitor localStorage overlay (apiFetch)
+│       ├── visitor-id.ts             # Anonymous contributor id (cityfix_user_id)
+│       ├── demo-data.ts              # Sample dataset (35 reports, 5 clusters)
+│       ├── store.ts, user-store.ts   # In-memory stores (seed data)
 │       └── supabase/                 # DB clients
 └── supabase/
     ├── migrations/001_initial.sql    # Schema
@@ -286,13 +327,23 @@ Resident submits photo + location + description
 
 ## Deployment
 
-**Vercel (recommended)**
+**Vercel: public demo (free tier, no keys)**
+
+1. Import the repo at [vercel.com/new](https://vercel.com/new) (framework preset: Next.js).
+2. Under **Settings → Environment Variables**, add `NEXT_PUBLIC_DEMO_MODE=true`.
+   Optionally add `ADMIN_SESSION_SECRET` (any long random string) to replace the built-in demo fallback.
+   Leave `OPENAI_API_KEY` and the Supabase variables unset; demo mode doesn't use them.
+3. Deploy. `NEXT_PUBLIC_*` variables are inlined at build time, so redeploy after changing them.
+
+**Vercel: production**
+
+Set all `.env.local` variables (Supabase, OpenAI, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`) with `NEXT_PUBLIC_DEMO_MODE=false`, then:
 
 ```bash
-vercel deploy
+vercel deploy --prod
 ```
 
-Set all `.env.local` variables in the Vercel dashboard under **Settings → Environment Variables**.
+Without `ADMIN_SESSION_SECRET`, admin login is disabled outside demo mode.
 
 **Self-hosted**
 

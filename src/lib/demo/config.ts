@@ -12,3 +12,10 @@ export function aiEnabled(): boolean {
   const key = process.env.OPENAI_API_KEY;
   return !IS_DEMO && !!key && !key.startsWith('sk-placeholder');
 }
+
+/**
+ * Default admin credentials. They are the fallback when ADMIN_EMAIL / ADMIN_PASSWORD
+ * are unset, and are shown (and used for one-click login) on the login page in demo mode.
+ */
+export const DEMO_ADMIN_EMAIL = 'admin@cityfix.ai';
+export const DEMO_ADMIN_PASSWORD = 'cityfix-admin-2024';

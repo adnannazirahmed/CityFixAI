@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DEPARTMENT_LABELS } from '@/data/seeclickfix-categories';
 import type { ChatMessage, IntakeData } from '@/lib/openai/intake-chat';
 import { apiFetch } from '@/lib/demo/browser-store';
+import { getOrCreateVisitorId } from '@/lib/visitor-id';
 
 interface DisplayMessage {
   id: string;
@@ -133,7 +134,13 @@ export function IntakeChat() {
       const res = await apiFetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: intake.description_en, latitude: lat, longitude: lng, image_url: photoDataUrl }),
+        body: JSON.stringify({
+          description: intake.description_en,
+          latitude: lat,
+          longitude: lng,
+          image_url: photoDataUrl,
+          user_id: getOrCreateVisitorId(), // so chat reports earn contributor points
+        }),
       });
 
       if (!res.ok) throw new Error('submit failed');

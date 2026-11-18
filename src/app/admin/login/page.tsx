@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { MapPin, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { MapPin, Lock, Loader2, Eye, EyeOff, LayoutDashboard } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { IS_DEMO, DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD } from '@/lib/demo/config';
 
 const schema = z.object({
   email: z.string().email('Invalid email'),
@@ -19,21 +20,37 @@ const schema = z.object({
 
 type LoginData = z.infer<typeof schema>;
 
+/** Only allow same-origin relative paths as redirect targets (no open redirects). */
+function safeNext(next: string | null): string {
+  if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) return '/admin';
+  if (next === '/admin/login' || next.startsWith('/admin/login?')) return '/admin';
+  return next;
+}
+
 export default function AdminLoginPage() {
-  const router = useRouter();
+  return (
+    <Suspense>
+      <AdminLogin />
+    </Suspense>
+  );
+}
+
+function AdminLogin() {
+  const searchParams = useSearchParams();
+  const next = safeNext(searchParams.get('next'));
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      email: 'admin@cityfix.ai',
+      email: IS_DEMO ? DEMO_ADMIN_EMAIL : '',
       password: '',
     },
   });
 
-  async function onSubmit(data: LoginData) {
-    setLoading(true);
+  async function login(data: LoginData): Promise<boolean> {
     try {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
@@ -44,20 +61,31 @@ export default function AdminLoginPage() {
 
       if (!res.ok || json.error) {
         toast.error(json.error ?? 'Login failed. Check your credentials.');
-        return;
+        return false;
       }
 
       toast.success('Welcome back, Admin!');
-      router.push('/admin');
+      // Full navigation so middleware sees the new session cookie.
+      window.location.assign(next);
+      return true;
     } catch {
       toast.error('Network error. Please try again.');
-    } finally {
-      setLoading(false);
+      return false;
     }
   }
 
+  async function onSubmit(data: LoginData) {
+    setLoading(true);
+    if (!(await login(data))) setLoading(false);
+  }
+
+  async function enterDemo() {
+    setDemoLoading(true);
+    if (!(await login({ email: DEMO_ADMIN_EMAIL, password: DEMO_ADMIN_PASSWORD }))) setDemoLoading(false);
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 to-blue-950 flex items-center justify-center p-4">
+    <div className="min-h-full bg-gradient-to-br from-gray-950 to-blue-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         {/* Logo */}
         <div className="text-center space-y-2">
@@ -67,6 +95,28 @@ export default function AdminLoginPage() {
           <h1 className="text-2xl font-black text-white">CityFix <span className="text-blue-400">AI</span></h1>
           <p className="text-gray-400 text-sm">Admin Console</p>
         </div>
+
+        {IS_DEMO && (
+          <Card className="border-blue-500/40 bg-blue-950/60 text-white shadow-xl">
+            <CardContent className="space-y-3 p-5">
+              <Button
+                type="button"
+                onClick={enterDemo}
+                disabled={demoLoading || loading}
+                className="w-full bg-blue-500 hover:bg-blue-400 text-white h-12 gap-2 text-base font-semibold"
+              >
+                {demoLoading ? (
+                  <><Loader2 className="h-5 w-5 animate-spin" /> Opening dashboard…</>
+                ) : (
+                  <><LayoutDashboard className="h-5 w-5" /> Enter demo dashboard</>
+                )}
+              </Button>
+              <p className="text-xs text-blue-200/80 text-center">
+                One click, no password needed. This is a portfolio demo with sample data.
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Login card */}
         <Card className="border-gray-800 bg-gray-900 text-white shadow-xl">
@@ -120,7 +170,7 @@ export default function AdminLoginPage() {
 
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || demoLoading}
                 className="w-full bg-blue-600 hover:bg-blue-500 text-white h-11 gap-2"
               >
                 {loading ? (
@@ -134,14 +184,16 @@ export default function AdminLoginPage() {
         </Card>
 
         {/* Demo hint */}
+        {IS_DEMO && (
         <Card className="border-gray-800 bg-gray-900/50">
           <CardContent className="py-3 px-4">
             <p className="text-xs text-gray-400 text-center">
-              Demo credentials: <strong className="text-gray-200">admin@cityfix.ai</strong> /{' '}
-              <strong className="text-gray-200">cityfix-admin-2024</strong>
+              Demo credentials: <strong className="text-gray-200">{DEMO_ADMIN_EMAIL}</strong> /{' '}
+              <strong className="text-gray-200">{DEMO_ADMIN_PASSWORD}</strong>
             </p>
           </CardContent>
         </Card>
+        )}
       </div>
     </div>
   );

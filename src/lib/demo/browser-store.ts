@@ -15,9 +15,9 @@ import {
   type UserScore,
 } from '@/lib/scoring/user-score';
 import type { Report, ReportStatus } from '@/types';
+import { readVisitorId } from '@/lib/visitor-id';
 
 const STORAGE_KEY = 'cityfix-demo-v1';
-const USER_ID_KEY = 'cityfix_user_id';
 const MAX_REPORTS = 15;
 const DEFAULT_LIMIT = 100; // matches GET /api/reports
 
@@ -72,14 +72,6 @@ function saveState(state: DemoState): void {
       if (idx === -1) return; // nothing left to strip (or storage unavailable)
       reports[idx] = { ...reports[idx], image_url: null };
     }
-  }
-}
-
-function getVisitorId(): string | null {
-  try {
-    return window.localStorage.getItem(USER_ID_KEY);
-  } catch {
-    return null;
   }
 }
 
@@ -182,7 +174,7 @@ async function createReport(input: string, init?: RequestInit): Promise<Response
   if (!report) return res;
 
   const body = parseBody(init);
-  const userId = (typeof body.user_id === 'string' && body.user_id) || getVisitorId();
+  const userId = (typeof body.user_id === 'string' && body.user_id) || readVisitorId();
   const saved: Report = { ...report, user_id: userId ?? null };
 
   const state = loadState();

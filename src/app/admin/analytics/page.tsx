@@ -17,6 +17,7 @@ import {
 } from '@/lib/demo-data';
 import { getCategoryLabel, getCategoryIcon } from '@/lib/utils';
 import type { AreaInsight, DuplicateCluster } from '@/types';
+import { IS_DEMO } from '@/lib/demo/config';
 
 export default function AdminAnalyticsPage() {
   const [insights, setInsights] = useState<AreaInsight[]>(DEMO_INSIGHTS);
@@ -52,6 +53,11 @@ export default function AdminAnalyticsPage() {
             Data-driven intelligence for equitable city management
           </p>
         </div>
+        {IS_DEMO && (
+          <span className="ml-auto rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800">
+            Analytics reflect the sample dataset.
+          </span>
+        )}
       </div>
 
       {/* ─── Trends + Categories ────────────────────────────────────────── */}

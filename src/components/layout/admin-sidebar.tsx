@@ -1,13 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, FileText, BarChart3, MapPin,
   LogOut, Settings, AlertTriangle, Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { IS_DEMO } from '@/lib/demo/config';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -17,12 +18,12 @@ const navItems = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
 
   async function handleLogout() {
     try {
       await fetch('/api/admin/login', { method: 'DELETE' });
-      router.push('/admin/login');
+      // Full navigation so no cached admin page is shown after the cookie is gone.
+      window.location.assign('/admin/login');
     } catch {
       toast.error('Logout failed');
     }
@@ -37,7 +38,14 @@ export function AdminSidebar() {
           </div>
         <div>
           <p className="font-black text-sm tracking-wide">CityFix <span className="text-blue-400">AI</span></p>
-          <p className="text-xs text-gray-400">Admin Console</p>
+          <p className="flex items-center gap-1.5 text-xs text-gray-400">
+            Admin Console
+            {IS_DEMO && (
+              <span className="rounded bg-amber-400/15 px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-amber-300 ring-1 ring-amber-400/30">
+                Demo
+              </span>
+            )}
+          </p>
         </div>
       </div>
 

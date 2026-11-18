@@ -20,6 +20,7 @@ import { Progress } from '@/components/ui/progress';
 import { getCategoryLabel, getScoreColor } from '@/lib/utils';
 import type { AIAnalysisResult } from '@/types';
 import { apiFetch } from '@/lib/demo/browser-store';
+import { getOrCreateVisitorId } from '@/lib/visitor-id';
 
 const schema = z.object({
   description: z.string().min(10, 'Please provide at least 10 characters').max(1000),
@@ -222,11 +223,7 @@ export function ReportForm() {
     setStep('submitting');
 
     // Get or generate anonymous user ID
-    let userId = localStorage.getItem('cityfix_user_id');
-    if (!userId) {
-      userId = `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      localStorage.setItem('cityfix_user_id', userId);
-    }
+    const userId = getOrCreateVisitorId();
 
     try {
       const res = await apiFetch('/api/reports', {

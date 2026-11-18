@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Bell, RefreshCw, Loader2, ArrowRight, AlertTriangle } from 'lucide-react';
@@ -18,6 +18,7 @@ import { formatRelativeTime, getStatusLabel } from '@/lib/utils';
 import { DEMO_STATS } from '@/lib/demo-data';
 import type { Report, DashboardStats, ReportStatus, CategoryChartData, TrendChartData } from '@/types';
 import { apiFetch } from '@/lib/demo/browser-store';
+import { IS_DEMO } from '@/lib/demo/config';
 
 const CATEGORY_COLORS: Record<string, string> = {
   pothole: '#EF4444',
@@ -56,6 +57,28 @@ function computeTrends(reports: Report[]): TrendChartData[] {
   });
 }
 
+/**
+ * Report-count stats from a report list, using the same definitions as GET /api/insights.
+ * Cluster count and average resolution time come from the server stats.
+ */
+function computeReportStats(reports: Report[], base: DashboardStats): DashboardStats {
+  const total = reports.length;
+  const resolved = reports.filter(r => r.status === 'resolved').length;
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  return {
+    ...base,
+    total_reports: total,
+    open_reports: total - resolved,
+    resolved_reports: resolved,
+    high_priority_reports: reports.filter(
+      r => (r.priority_level === 'critical' || r.priority_level === 'high') && r.status !== 'resolved'
+    ).length,
+    reports_this_week: reports.filter(r => new Date(r.created_at) > oneWeekAgo).length,
+    resolution_rate: total > 0 ? Math.round((resolved / total) * 100) : 0,
+  };
+}
+
 const IssueMap = dynamic(
   () => import('@/components/map/issue-map').then((m) => m.IssueMap),
   { ssr: false, loading: () => <div className="h-64 bg-gray-100 rounded-xl animate-pulse" /> }
@@ -63,7 +86,13 @@ const IssueMap = dynamic(
 
 export default function AdminDashboardPage() {
   const [reports, setReports] = useState<Report[]>([]);
-  const [stats, setStats] = useState<DashboardStats>(DEMO_STATS);
+  const [serverStats, setServerStats] = useState<DashboardStats>(DEMO_STATS);
+  // In demo mode the merged list (seed + this visitor's reports and status changes) is the
+  // source of truth for the counts; elsewhere the server's stats cover the whole database.
+  const stats = useMemo(
+    () => (IS_DEMO && reports.length > 0 ? computeReportStats(reports, serverStats) : serverStats),
+    [reports, serverStats]
+  );
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -80,7 +109,7 @@ export default function AdminDashboardPage() {
       ]);
 
       if (reportsData.data) setReports(reportsData.data);
-      if (insightsData.data?.stats) setStats(insightsData.data.stats);
+      if (insightsData.data?.stats) setServerStats(insightsData.data.stats);
     } catch {
       // Keep demo data on error
     } finally {

@@ -1,6 +1,7 @@
 import { Navbar } from '@/components/layout/navbar';
 import { IntakeChat } from '@/components/chat/intake-chat';
-import { Globe, Zap, MessageSquare } from 'lucide-react';
+import { Globe, Zap, MessageSquare, Info } from 'lucide-react';
+import { IS_DEMO } from '@/lib/demo/config';
 
 export default function ChatPage() {
   return (
@@ -40,6 +41,19 @@ export default function ChatPage() {
               </div>
             ))}
           </div>
+
+          {IS_DEMO && (
+            <div className="mb-4 flex gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-xs text-amber-900">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <p>
+                <strong>Demo:</strong> replies are scripted, rule-based responses, not live AI.
+                The full scripted conversation is available in English, Español and Português.
+                In the other languages only the greeting is translated; follow-up replies are in
+                English. Issue detection matches keywords (mostly English, some Spanish and
+                Portuguese).
+              </p>
+            </div>
+          )}
 
           {/* ─── Chat window ──────────────────────────────────────────────── */}
           <div className="bg-white rounded-2xl border shadow-sm overflow-hidden" style={{ height: '580px' }}>
