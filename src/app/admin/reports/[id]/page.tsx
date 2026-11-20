@@ -36,6 +36,7 @@ export default function AdminReportDetailPage() {
   const router = useRouter();
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [note, setNote] = useState('');
 
@@ -274,7 +275,7 @@ export default function AdminReportDetailPage() {
           </Card>
 
           {/* Image */}
-          {report.image_url && (
+          {report.image_url && !photoFailed && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base">Photo</CardTitle>
@@ -283,6 +284,7 @@ export default function AdminReportDetailPage() {
                 <img
                   src={report.image_url}
                   alt="Report photo"
+                  onError={() => setPhotoFailed(true)}
                   className="w-full rounded-lg object-cover"
                   style={{ maxHeight: '240px' }}
                 />

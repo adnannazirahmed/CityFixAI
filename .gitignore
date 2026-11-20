@@ -32,3 +32,6 @@ next-env.d.ts
 # presentation files
 *.pptx
 generate_ppt.py
+
+# demo sample photo originals (may contain EXIF/GPS); processed copies live in public/demo/samples/
+demo-photos-raw/

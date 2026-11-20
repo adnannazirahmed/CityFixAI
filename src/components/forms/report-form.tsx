@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   MapPin, Loader2, CheckCircle2, AlertCircle,
-  Camera, X, Brain, Navigation, Home,
+  Camera, X, Brain, Navigation, Home, Landmark, Sparkles, Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,10 +17,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { getCategoryLabel, getScoreColor } from '@/lib/utils';
+import { getCategoryIcon, getCategoryLabel, getScoreColor } from '@/lib/utils';
 import type { AIAnalysisResult } from '@/types';
 import { apiFetch } from '@/lib/demo/browser-store';
 import { getOrCreateVisitorId } from '@/lib/visitor-id';
+import { IS_DEMO } from '@/lib/demo/config';
+import { DEMO_CITY_HALL, DEMO_SAMPLES, getSavedAnalysis, type DemoSample } from '@/data/demo-samples';
 
 const schema = z.object({
   description: z.string().min(10, 'Please provide at least 10 characters').max(1000),
@@ -31,6 +33,81 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 type Step = 'location' | 'describe' | 'analyzing' | 'preview' | 'submitting' | 'done';
+
+/** Where the preview's analysis came from (demo mode only). */
+type AnalysisOrigin =
+  | { kind: 'saved'; source: 'gpt-4o' | 'placeholder'; generatedAt?: string }
+  | { kind: 'rule-based' };
+
+const SAVED_RESULT_DELAY_MS = 1200;
+
+function formatGeneratedDate(iso?: string): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? null
+    : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// ─── Sample photo tile (demo mode) ────────────────────────────────────────────
+function SamplePhotoTile({ sample, selected, onPick }: { sample: DemoSample; selected: boolean; onPick: () => void }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div className="min-w-0">
+      <button
+        type="button"
+        onClick={onPick}
+        aria-pressed={selected}
+        className={`group block w-full overflow-hidden rounded-lg border-2 text-left transition-all ${
+          selected ? 'border-blue-600 ring-2 ring-blue-200' : 'border-transparent hover:border-blue-300'
+        }`}
+      >
+        {failed ? (
+          <div className="flex aspect-[4/3] w-full items-center justify-center bg-gray-100 text-3xl" aria-hidden>
+            {getCategoryIcon(sample.category)}
+          </div>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={sample.image}
+            alt={sample.label}
+            loading="lazy"
+            onError={() => setFailed(true)}
+            className="aspect-[4/3] w-full object-cover"
+          />
+        )}
+        <span className="block truncate bg-white px-2 py-1 text-xs font-medium text-gray-800">{sample.label}</span>
+      </button>
+      {sample.creditLabel && (
+        <p className="mt-0.5 truncate px-0.5 text-[10px] leading-tight text-gray-400">
+          {sample.credit?.url ? (
+            <a href={sample.credit.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+              {sample.creditLabel}
+            </a>
+          ) : (
+            sample.creditLabel
+          )}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Preview image that falls back to a category tile if a sample photo fails to load. */
+function PreviewImage({ src, fallbackIcon }: { src: string; fallbackIcon: string | null }) {
+  const [failed, setFailed] = useState(false);
+  if (failed && fallbackIcon) {
+    return (
+      <div className="flex h-48 w-full items-center justify-center rounded-lg border bg-gray-100 text-5xl" aria-hidden>
+        {fallbackIcon}
+      </div>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt="Preview" onError={() => setFailed(true)} className="w-full h-48 object-cover rounded-lg border" />
+  );
+}
 
 export function ReportForm() {
   const router = useRouter();
@@ -56,10 +133,14 @@ export function ReportForm() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null);
+  const [analysisOrigin, setAnalysisOrigin] = useState<AnalysisOrigin | null>(null);
+  // Demo mode: chosen sample photo, and a human-readable label for demo locations
+  const [selectedSample, setSelectedSample] = useState<DemoSample | null>(null);
+  const [locationLabel, setLocationLabel] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
@@ -91,6 +172,16 @@ export function ReportForm() {
       { timeout: 10000 }
     );
   }, []);
+
+  // ─── Demo location (Worcester City Hall) ────────────────────────────────────
+  const applyDemoLocation = () => {
+    setLocation({ lat: DEMO_CITY_HALL.latitude, lng: DEMO_CITY_HALL.longitude });
+    setLocationLabel(`Worcester City Hall, ${DEMO_CITY_HALL.address}`);
+    setLocationError(null);
+    setValue('address', DEMO_CITY_HALL.address);
+    setValue('neighborhood', DEMO_CITY_HALL.neighborhood);
+    setStep('describe');
+  };
 
   // ─── Address autocomplete (Nominatim) ────────────────────────────────────────
   const fetchSuggestions = useCallback(async (query: string) => {
@@ -172,40 +263,72 @@ export function ReportForm() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setSelectedSample(null);
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
   };
 
   const removeImage = () => {
+    setSelectedSample(null);
     setImageFile(null);
     setImagePreview(null);
     setImageUrl(null);
     if (fileRef.current) fileRef.current.value = '';
   };
 
+  // ─── Demo: pick a sample photo ─────────────────────────────────────────────
+  const pickSample = (sample: DemoSample) => {
+    setSelectedSample(sample);
+    setImageFile(null);
+    setImagePreview(sample.image);
+    setImageUrl(sample.image);
+    if (fileRef.current) fileRef.current.value = '';
+    setValue('description', sample.description, { shouldValidate: true });
+    setValue('address', sample.address);
+    setValue('neighborhood', sample.neighborhood);
+    setLocation({ lat: sample.latitude, lng: sample.longitude });
+    setLocationLabel(`${sample.address}, ${sample.neighborhood}`);
+    setError(null);
+  };
+
   // ─── Analyze with AI ──────────────────────────────────────────────────────
   const analyzeWithAI = async (data: FormData) => {
-    if (!imageFile) {
+    if (!imageFile && !selectedSample) {
       setError('A photo is required. Please upload a photo of the issue so AI can verify it.');
       return;
     }
     setStep('analyzing');
     setError(null);
 
+    // Demo: an unedited sample uses its saved analysis (no API call).
+    if (IS_DEMO && selectedSample && data.description.trim() === selectedSample.description.trim()) {
+      const saved = getSavedAnalysis(selectedSample.id);
+      if (saved) {
+        await new Promise(resolve => setTimeout(resolve, SAVED_RESULT_DELAY_MS));
+        setImageUrl(selectedSample.image);
+        setAiResult(saved.analysis);
+        setAnalysisOrigin({ kind: 'saved', source: saved.source, generatedAt: saved.generatedAt });
+        setStep('preview');
+        return;
+      }
+    }
+
     try {
-      // Compress image client-side first so the base64 stays well under JSON body limits
-      const compressedDataUrl = await compressImage(imageFile);
-      setImageUrl(compressedDataUrl);
+      // Compress an uploaded image client-side first so the base64 stays well under JSON body limits.
+      // A sample photo is sent by its public path (samples only exist in demo mode, where analysis is rule-based).
+      const imageForAnalysis = imageFile ? await compressImage(imageFile) : selectedSample!.image;
+      setImageUrl(imageForAnalysis);
 
       // AI analysis preview — send compressed base64 directly, no upload needed
       const analyzeRes = await apiFetch('/api/ai/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: data.description, image_url: compressedDataUrl }),
+        body: JSON.stringify({ description: data.description, image_url: imageForAnalysis }),
       });
       const analyzeData = await analyzeRes.json();
       if (analyzeData.data) {
         setAiResult(analyzeData.data);
+        setAnalysisOrigin(IS_DEMO ? { kind: 'rule-based' } : null);
         setStep('preview');
       } else {
         throw new Error(analyzeData.error ?? 'AI analysis failed');
@@ -273,6 +396,16 @@ export function ReportForm() {
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{locationError}</AlertDescription>
           </Alert>
+        )}
+
+        {IS_DEMO && (
+          <Button
+            type="button"
+            onClick={applyDemoLocation}
+            className="w-full bg-gray-900 hover:bg-gray-800 text-white h-12 text-base gap-2"
+          >
+            <Landmark className="h-5 w-5" /> Use demo location (Worcester City Hall)
+          </Button>
         )}
 
         {/* Option 1: GPS */}
@@ -385,25 +518,47 @@ export function ReportForm() {
         {location && (
           <div className="flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 px-3 py-2 text-sm text-green-800">
             <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />
-            <span>
+            <span className="min-w-0">
               Location captured:{' '}
               <strong>{location.lat.toFixed(4)}, {location.lng.toFixed(4)}</strong>
+              {locationLabel && <span className="text-green-700"> · {locationLabel}</span>}
             </span>
+          </div>
+        )}
+
+        {/* Demo: sample photos */}
+        {IS_DEMO && DEMO_SAMPLES.length > 0 && (
+          <div className="space-y-2">
+            <Label>Pick a sample photo</Label>
+            <p className="text-xs text-gray-500">
+              Fills in the photo, description and location. Try “Mismatch test” to see a photo that
+              contradicts its description.
+            </p>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+              {DEMO_SAMPLES.map(sample => (
+                <SamplePhotoTile
+                  key={sample.id}
+                  sample={sample}
+                  selected={selectedSample?.id === sample.id}
+                  onPick={() => pickSample(sample)}
+                />
+              ))}
+            </div>
           </div>
         )}
 
         {/* Image upload */}
         <div className="space-y-2">
           <Label>
-            Photo <span className="text-red-500">*</span>
+            {IS_DEMO ? 'Or upload your own photo' : 'Photo'} <span className="text-red-500">*</span>
             <span className="ml-1 text-xs text-gray-400 font-normal">(required — AI uses it to verify the issue)</span>
           </Label>
           {imagePreview ? (
             <div className="relative">
-              <img
+              <PreviewImage
+                key={imagePreview}
                 src={imagePreview}
-                alt="Preview"
-                className="w-full h-48 object-cover rounded-lg border"
+                fallbackIcon={selectedSample ? getCategoryIcon(selectedSample.category) : null}
               />
               <button
                 type="button"
@@ -515,7 +670,11 @@ export function ReportForm() {
         <div className="flex items-center justify-between rounded-lg bg-blue-50 border border-blue-200 px-3 py-2">
           <div className="flex items-center gap-2">
             <Brain className="h-4 w-4 text-blue-600 shrink-0" />
-            <p className="text-sm text-blue-800 font-medium">AI Analysis Complete</p>
+            <p className="text-sm text-blue-800 font-medium">
+              {analysisOrigin && !(analysisOrigin.kind === 'saved' && analysisOrigin.source === 'gpt-4o')
+                ? 'Analysis Complete'
+                : 'AI Analysis Complete'}
+            </p>
           </div>
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
             aiResult.confidence >= 85 ? 'bg-green-100 text-green-700' :
@@ -526,6 +685,41 @@ export function ReportForm() {
             Visual confidence: {aiResult.confidence}/100
           </span>
         </div>
+
+        {analysisOrigin && (
+          <div
+            className={`flex items-start gap-2 rounded-lg border px-3 py-2 text-xs ${
+              analysisOrigin.kind === 'saved' && analysisOrigin.source === 'gpt-4o'
+                ? 'border-violet-200 bg-violet-50 text-violet-800'
+                : 'border-gray-200 bg-gray-50 text-gray-700'
+            }`}
+          >
+            {analysisOrigin.kind === 'saved' && analysisOrigin.source === 'gpt-4o' ? (
+              <>
+                <Sparkles className="h-3.5 w-3.5 shrink-0 mt-px" />
+                <span>
+                  <strong>Saved GPT-4o result</strong>
+                  {formatGeneratedDate(analysisOrigin.generatedAt) && <> · generated {formatGeneratedDate(analysisOrigin.generatedAt)}</>}
+                  {' '}· produced once for this sample photo and description, not live
+                </span>
+              </>
+            ) : analysisOrigin.kind === 'saved' ? (
+              <>
+                <Info className="h-3.5 w-3.5 shrink-0 mt-px" />
+                <span>
+                  <strong>Placeholder result</strong> · a hand-written stand-in until a GPT-4o result is generated for this sample
+                </span>
+              </>
+            ) : (
+              <>
+                <Info className="h-3.5 w-3.5 shrink-0 mt-px" />
+                <span>
+                  <strong>Rule-based demo analysis</strong> — live AI is turned off in this demo
+                </span>
+              </>
+            )}
+          </div>
+        )}
 
         {aiResult.mismatch_detected && (
           <div className="flex items-start gap-2 rounded-lg bg-yellow-50 border border-yellow-300 px-3 py-3">

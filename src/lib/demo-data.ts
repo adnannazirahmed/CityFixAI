@@ -8,7 +8,7 @@ export const DEMO_REPORTS: Report[] = [
     user_id: null,
     title: 'Large Pothole on Main Street Near City Hall',
     description: 'Deep pothole approximately 2ft wide on Main St just south of City Hall. Vehicles swerving into oncoming lane.',
-    image_url: null,
+    image_url: '/demo/samples/pothole.jpg', // demo sample photo (npm run demo:photos)
     latitude: 42.2629, longitude: -71.8022,
     address: '455 Main St', neighborhood: 'Downtown',
     category: 'pothole',
@@ -28,7 +28,7 @@ export const DEMO_REPORTS: Report[] = [
     user_id: null,
     title: 'Broken Streetlight Near Grafton Hill Elementary',
     description: 'Streetlight not functioning at corner of Grafton St and Beacon St, near Grafton Hill Elementary. Very dark at night.',
-    image_url: null,
+    image_url: '/demo/samples/broken_streetlight.jpg', // demo sample photo (npm run demo:photos)
     latitude: 42.2558, longitude: -71.7785,
     address: 'Grafton St & Beacon St', neighborhood: 'Grafton Hill',
     category: 'broken_streetlight',
@@ -68,7 +68,7 @@ export const DEMO_REPORTS: Report[] = [
     user_id: null,
     title: 'Illegal Dumping of Appliances on Chandler Street',
     description: 'Several old appliances (refrigerators, mattresses) dumped on the corner of Chandler St and Woodland St.',
-    image_url: null,
+    image_url: '/demo/samples/illegal_dumping.jpg', // demo sample photo (npm run demo:photos)
     latitude: 42.2702, longitude: -71.7908,
     address: 'Chandler St & Woodland St', neighborhood: 'Chandler',
     category: 'illegal_dumping',
@@ -208,7 +208,7 @@ export const DEMO_REPORTS: Report[] = [
     user_id: null,
     title: 'Sidewalk Crack Near Great Brook Valley Bus Stop',
     description: 'Large crack in sidewalk near WRTA bus stop on Plantation St. Elderly residents having trouble navigating.',
-    image_url: null,
+    image_url: '/demo/samples/damaged_sidewalk.jpg', // demo sample photo (npm run demo:photos)
     latitude: 42.2898, longitude: -71.8195,
     address: 'Plantation St at WRTA Bus Stop', neighborhood: 'Great Brook Valley',
     category: 'damaged_sidewalk',
@@ -248,7 +248,7 @@ export const DEMO_REPORTS: Report[] = [
     user_id: null,
     title: 'Flooding at Great Brook Valley Underpass',
     description: 'Water accumulation at the underpass on Burncoat St after rain. Road impassable for low vehicles.',
-    image_url: null,
+    image_url: '/demo/samples/flooding.jpg', // demo sample photo (npm run demo:photos)
     latitude: 42.2905, longitude: -71.8215,
     address: 'Burncoat St Underpass', neighborhood: 'Great Brook Valley',
     category: 'flooding',
@@ -268,7 +268,7 @@ export const DEMO_REPORTS: Report[] = [
     user_id: null,
     title: 'Graffiti on Main South Library Branch',
     description: 'Large graffiti tag on the side wall of the Main South branch library on Chandler St.',
-    image_url: null,
+    image_url: '/demo/samples/graffiti.jpg', // demo sample photo (npm run demo:photos)
     latitude: 42.2491, longitude: -71.8062,
     address: 'Chandler Branch Library, Main South', neighborhood: 'Main South',
     category: 'graffiti',

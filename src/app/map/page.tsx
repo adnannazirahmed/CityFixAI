@@ -54,6 +54,7 @@ export default function MapPage() {
     priority_level: r.priority_level,
     status: r.status,
     neighborhood: r.neighborhood,
+    image_url: r.image_url,
   }));
 
   const handleMarkerClick = (id: string) => {

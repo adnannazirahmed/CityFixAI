@@ -12,6 +12,17 @@ interface IssueMapProps {
   onMarkerClick?: (id: string) => void;
 }
 
+/** Popup photo markup for same-origin paths, https URLs and inline image data; '' otherwise. */
+function buildPopupImage(url: string | null | undefined): string {
+  if (!url) return '';
+  const safe = /^\/[\w\-./]+\.(jpe?g|png|webp)$/i.test(url)
+    || /^https:\/\//i.test(url)
+    || /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(url);
+  if (!safe) return '';
+  const src = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  return `<img src="${src}" alt="" onerror="this.remove()" style="display:block; width:100%; height:110px; object-fit:cover; border-radius:6px; margin-bottom:6px;" />`;
+}
+
 type MarkerClickWindow = Window & { __mapMarkerClick?: (id: string) => void };
 
 function buildIconHtml(color: string): string {
@@ -90,6 +101,7 @@ export function IssueMap({
           .addTo(map)
           .bindPopup(`
             <div style="font-family: sans-serif; min-width: 200px;">
+              ${buildPopupImage(marker.image_url)}
               <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px; color: #111;">${marker.title}</div>
               <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;">
                 <span style="background: ${color}20; color: ${color}; border: 1px solid ${color}40; border-radius: 9999px; padding: 2px 8px; font-size: 11px; font-weight: 600;">

@@ -11,8 +11,9 @@ import { resetDemo } from '@/lib/demo/browser-store';
 // Rendered by the root layout only when IS_DEMO. Its height must match
 // --demo-banner-h (set on <html> in src/app/layout.tsx), which the admin shell uses.
 
-const GUIDE: { href: string; label: string; tip: string }[] = [
-  { href: '/report', label: 'Report an issue', tip: 'Describe a problem (e.g. "pothole on Main St"), pin a location, optionally add a photo, and see the priority scores.' },
+type GuideStep = { href: string; label: string; tip: string };
+
+const GUIDE_AFTER_REPORT: GuideStep[] = [
   { href: '/chat', label: 'Chat to report', tip: 'Switch the language to Español and report an issue conversationally.' },
   { href: '/map', label: 'Issue map', tip: 'Find your new report among the open issues across Worcester.' },
   { href: '/leaderboard', label: 'Leaderboard', tip: 'See your contributor score and badges next to the sample residents.' },
@@ -21,8 +22,19 @@ const GUIDE: { href: string; label: string; tip: string }[] = [
   { href: '/admin/analytics', label: 'Analytics', tip: 'Explore the equity heatmap, trends and category breakdowns.' },
 ];
 
-export function DemoBanner() {
+interface DemoBannerProps {
+  /** What the demo's AI results are, derived from the saved analyses' `source` fields. */
+  aiNote: string;
+  /** Guide tip for /report, derived the same way. */
+  reportTip: string;
+}
+
+export function DemoBanner({ aiNote, reportTip }: DemoBannerProps) {
   const [open, setOpen] = useState(false);
+  const guide: GuideStep[] = [
+    { href: '/report', label: 'Report an issue', tip: reportTip },
+    ...GUIDE_AFTER_REPORT,
+  ];
 
   function handleReset() {
     resetDemo();
@@ -38,7 +50,7 @@ export function DemoBanner() {
       <p className="min-w-0 flex-1 truncate">
         <span className="font-semibold text-amber-300">Portfolio demo</span>
         <span className="hidden md:inline">
-          {' '}· Sample data for Worcester, MA · AI responses are simulated (no live AI calls) · Your changes stay in this browser.
+          {' '}· Sample data for Worcester, MA · {aiNote} · Your changes stay in this browser.
         </span>
       </p>
 
@@ -57,12 +69,12 @@ export function DemoBanner() {
             <DialogHeader>
               <DialogTitle>Tour the demo</DialogTitle>
               <DialogDescription>
-                Everything runs on sample data for Worcester, MA. AI responses are simulated,
-                and anything you submit or change is saved only in this browser.
+                Everything runs on sample data for Worcester, MA. {aiNote}. Anything you submit
+                or change is saved only in this browser.
               </DialogDescription>
             </DialogHeader>
             <ol className="space-y-1">
-              {GUIDE.map((step, i) => (
+              {guide.map((step, i) => (
                 <li key={step.href}>
                   <Link
                     href={step.href}

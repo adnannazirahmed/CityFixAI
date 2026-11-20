@@ -145,6 +145,7 @@ export interface MapMarker {
   priority_level: PriorityLevel;
   status: ReportStatus;
   neighborhood: string | null;
+  image_url?: string | null;
 }
 
 // ─── Report Form Data ─────────────────────────────────────────────────────────

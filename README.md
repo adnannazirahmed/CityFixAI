@@ -163,7 +163,7 @@ A banner at the top of every page links to a guided tour and a **Reset demo** bu
 ### Demo walkthrough
 
 1. `/` — Landing page
-2. `/report` — Submit a photo-based report, see AI scores live
+2. `/report` — Pick a sample photo (or upload your own), see the analysis and priority scores
 3. `/chat` — Try multilingual AI chat reporting
 4. `/map` — Explore all open issues on the map
 5. `/leaderboard` — Community contributor scores
@@ -180,13 +180,32 @@ With `NEXT_PUBLIC_DEMO_MODE=true` the app runs with no database and no API keys.
 | UI, routing, map, charts, leaderboard | **Real**: the same code as production |
 | Priority scoring, duplicate/equity logic, badges, contributor scores | **Real**: same algorithms, run on demo data |
 | Report data | **Sample**: 35 hand-written reports and 5 clusters for Worcester, MA ([`src/lib/demo-data.ts`](src/lib/demo-data.ts)) |
-| Photo/description analysis (`/report`) | **Simulated**: keyword rules on the description; photos are not analyzed |
+| Sample photos on `/report` | **Saved GPT-4o results**: each sample's analysis was generated once with the app's real prompt and schema and committed ([`src/data/demo-sample-analyses.json`](src/data/demo-sample-analyses.json)). Entries with `"source": "placeholder"` are hand-written stand-ins until regenerated; the UI labels each result as *Saved GPT-4o result* or *Placeholder result* |
+| Your own photo, or an edited sample description | **Rule-based**: keyword rules on the description; the photo is not analyzed. Labeled *Rule-based demo analysis* |
 | Chat intake (`/chat`) | **Simulated**: scripted, rule-based replies. Full script in English, Spanish and Portuguese; other languages get a translated greeting, then English replies |
 | Neighborhood insights and cluster narratives | **Simulated**: templated text |
 | Your submissions, status changes and score | **Stored only in your browser** (`localStorage`). The server is read-only, so every visitor starts from the same sample data |
 | Admin login | **Real signed session** (HMAC cookie), with a one-click demo login |
 
-Demo mode never calls OpenAI, even if `OPENAI_API_KEY` is set.
+Demo mode never calls OpenAI, even if `OPENAI_API_KEY` is set. The banner and guide derive their wording from the `source` fields, so they only claim saved GPT-4o results once those exist.
+
+### Regenerate sample photos & analyses
+
+Sample photos and their saved analyses are produced locally and committed; the deployed demo never calls OpenAI.
+
+1. **Photos.** Put one photo per id in `demo-photos-raw/` (gitignored), named by id with any common extension:
+   `pothole`, `broken_streetlight`, `damaged_sidewalk`, `illegal_dumping`, `graffiti`, `flooding` (e.g. `pothole.jpg`, `graffiti.png`).
+   The "Mismatch test" sample reuses the graffiti photo with a pothole description.
+2. **Credits.** Fill in `demo-photos-raw/credits.json` (template: [`scripts/demo/credits.template.json`](scripts/demo/credits.template.json)):
+   `{ "<id>": { "source": "own" | "unsplash" | "pexels", "author": "...", "url": "...", "license": "..." } }`.
+   `own` photos are credited as "Photo by the CityFix team".
+3. **Process:** `npm run demo:photos` auto-rotates, resizes to 1024px max, re-encodes as JPEG and **strips all metadata (EXIF/GPS)**, writing `public/demo/samples/<id>.jpg`, `credits.json` and a `preview.html` contact sheet. It warns about missing photos or credits.
+4. **Analyze:** with `OPENAI_API_KEY` in `.env.local`, `npm run demo:analyze` sends each sample (photo + description + location context) to GPT-4o using the same prompt and schema as the app ([`src/lib/openai/analysis-shared.ts`](src/lib/openai/analysis-shared.ts)), asks for confirmation before the 7 calls, and writes `src/data/demo-sample-analyses.json`.
+5. Commit `public/demo/samples/` and `src/data/demo-sample-analyses.json`.
+
+### Photo credits
+
+Sample photo credits are listed in [`public/demo/samples/credits.json`](public/demo/samples/credits.json) and shown under each sample in the report form.
 
 ---
 
@@ -274,9 +293,13 @@ CityFixAI/
 │   │   ├── shared/                   # Priority/status badges, AI and score cards
 │   │   └── ui/                       # shadcn/ui primitives
 │   ├── data/
-│   │   └── seeclickfix-categories.ts # Categories, departments, SLAs, keywords
+│   │   ├── seeclickfix-categories.ts # Categories, departments, SLAs, keywords
+│   │   ├── demo-samples.ts           # Demo sample photos: descriptions, locations, credits
+│   │   ├── demo-sample-analyses.json # Saved GPT-4o (or placeholder) analyses per sample
+│   │   └── demo-photo-ids.json       # Sample photo ids (shared with scripts/demo)
 │   └── lib/
 │       ├── openai/analyze.ts         # GPT-4o Vision analysis (+ rule-based fallback)
+│       ├── openai/analysis-shared.ts # Prompt, schema, context and parsing (app + generator)
 │       ├── openai/intake-chat.ts     # Chat intake (+ scripted fallback)
 │       ├── scoring/priority.ts       # Priority scoring, duplicates, equity
 │       ├── scoring/user-score.ts     # Contributor scores and badges (client-safe)
@@ -287,6 +310,11 @@ CityFixAI/
 │       ├── demo-data.ts              # Sample dataset (35 reports, 5 clusters)
 │       ├── store.ts, user-store.ts   # In-memory stores (seed data)
 │       └── supabase/                 # DB clients
+├── public/demo/samples/           # Processed sample photos, credits.json, preview.html
+├── scripts/demo/
+│   ├── prepare-sample-photos.mjs     # npm run demo:photos (resize, strip metadata, credits)
+│   ├── generate-sample-analyses.ts   # npm run demo:analyze (saved GPT-4o results)
+│   └── credits.template.json         # Template for demo-photos-raw/credits.json
 └── supabase/
     ├── migrations/001_initial.sql    # Schema
     └── seed.sql                      # Seed data

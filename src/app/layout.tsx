@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import './globals.css';
 import { IS_DEMO } from '@/lib/demo/config';
 import { DemoBanner } from '@/components/layout/demo-banner';
+import { getDemoAiCopy } from '@/data/demo-samples';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const demoCopy = getDemoAiCopy();
   return (
     <html
       lang="en"
@@ -34,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className={inter.className}>
-        {IS_DEMO && <DemoBanner />}
+        {IS_DEMO && <DemoBanner aiNote={demoCopy.bannerNote} reportTip={demoCopy.reportTip} />}
         {children}
         <Toaster
           position="top-right"
