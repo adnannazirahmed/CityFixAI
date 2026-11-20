@@ -78,17 +78,6 @@ function SamplePhotoTile({ sample, selected, onPick }: { sample: DemoSample; sel
         )}
         <span className="block truncate bg-white px-2 py-1 text-xs font-medium text-gray-800">{sample.label}</span>
       </button>
-      {sample.creditLabel && (
-        <p className="mt-0.5 truncate px-0.5 text-[10px] leading-tight text-gray-400">
-          {sample.credit?.url ? (
-            <a href={sample.credit.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-              {sample.creditLabel}
-            </a>
-          ) : (
-            sample.creditLabel
-          )}
-        </p>
-      )}
     </div>
   );
 }
