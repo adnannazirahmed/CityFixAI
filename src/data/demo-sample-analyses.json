@@ -1,115 +1,130 @@
 {
   "pothole": {
-    "source": "placeholder",
     "analysis": {
       "category": "pothole",
       "severity": "high",
-      "title": "Deep Water-Filled Pothole in Travel Lane on Park Ave",
-      "summary": "A resident reports a pothole roughly two feet wide in the right travel lane of Park Ave near Chandler St. Standing water hides its depth, and drivers are swerving into the adjacent lane to avoid it.",
-      "urgency_score": 76,
-      "impact_score": 70,
-      "priority_score": 74,
-      "reasoning": "A concealed pothole in an active travel lane on a busy arterial creates collision and tire-damage risk, and lane swerving endangers other vehicles.",
-      "recommended_action": "Dispatch a DPW crew to cold-patch within 48 hours and schedule a permanent hot-mix repair.",
-      "confidence": 82,
+      "title": "Deep Pothole on Park Ave Causing Traffic Disruption",
+      "summary": "A large pothole filled with water on Park Ave is causing vehicles to swerve into adjacent lanes during evening rush hour, increasing the risk of accidents.",
+      "urgency_score": 85,
+      "impact_score": 90,
+      "priority_score": 88,
+      "reasoning": "The pothole's location on a busy road during rush hour and its concealment by water significantly heighten the risk of accidents.",
+      "recommended_action": "Deploy a repair crew immediately to fill the pothole and place warning signs until repairs are completed.",
+      "confidence": 95,
       "mismatch_detected": false
-    }
+    },
+    "source": "gpt-4o",
+    "model": "gpt-4o-2024-08-06",
+    "generatedAt": "2026-11-20T01:58:01.193Z"
   },
   "broken_streetlight": {
-    "source": "placeholder",
     "analysis": {
       "category": "broken_streetlight",
       "severity": "high",
-      "title": "Streetlight Out on Shrewsbury St Pedestrian Route",
-      "summary": "A streetlight near the Washington Square rotary on Shrewsbury St has been dark for over a week. The sidewalk is unlit at night on a route pedestrians use to and from Union Station.",
-      "urgency_score": 74,
-      "impact_score": 72,
-      "priority_score": 73,
-      "reasoning": "An unlit sidewalk on a well-used pedestrian route raises personal-safety and traffic risk after dark.",
-      "recommended_action": "Submit a repair ticket to the utility and inspect the fixture and photocell within 72 hours.",
-      "confidence": 78,
-      "mismatch_detected": false
-    }
+      "title": "Fallen Streetlight on Shrewsbury St Near Washington Square",
+      "summary": "A streetlight on Shrewsbury St near the Washington Square rotary has fallen, creating a hazard on the sidewalk. This area is heavily trafficked by pedestrians, especially during evening rush hour.",
+      "urgency_score": 85,
+      "impact_score": 90,
+      "priority_score": 88,
+      "reasoning": "The fallen streetlight poses a significant safety risk to pedestrians, especially during evening rush hour when visibility is crucial. The fall season increases pedestrian traffic due to earlier sunsets.",
+      "recommended_action": "Immediate removal of the fallen streetlight and installation of a temporary light source until repairs are completed.",
+      "confidence": 95,
+      "mismatch_detected": true,
+      "mismatch_note": "The photo shows a fallen streetlight, not just one that is out."
+    },
+    "source": "gpt-4o",
+    "model": "gpt-4o-2024-08-06",
+    "generatedAt": "2026-11-20T01:58:04.106Z"
   },
   "damaged_sidewalk": {
-    "source": "placeholder",
     "analysis": {
       "category": "damaged_sidewalk",
       "severity": "high",
-      "title": "Root-Heaved Sidewalk Slabs Near Clark University",
-      "summary": "Sidewalk slabs on Main St near Clark University are lifted several inches by tree roots. The resident reports trip incidents and says strollers and wheelchairs cannot pass.",
-      "urgency_score": 68,
-      "impact_score": 74,
-      "priority_score": 70,
-      "reasoning": "Vertical displacement of several inches is a trip hazard and an ADA accessibility barrier on a busy pedestrian corridor near a campus.",
-      "recommended_action": "Mark the hazard, grind or ramp the displaced edges now, and schedule slab replacement with a root barrier.",
-      "confidence": 80,
+      "title": "Severely Cracked Sidewalk on Main St Near Clark University",
+      "summary": "The sidewalk slabs on Main St are significantly cracked and uneven, posing a tripping hazard and obstructing access for strollers and wheelchairs. This issue is exacerbated during evening rush hours when pedestrian traffic is high.",
+      "urgency_score": 85,
+      "impact_score": 90,
+      "priority_score": 88,
+      "reasoning": "The damaged sidewalk poses a significant safety risk, especially during high pedestrian traffic times. The fall season may increase the risk of slipping due to wet leaves.",
+      "recommended_action": "Repair or replace the damaged sidewalk slabs to ensure safe and accessible pedestrian passage.",
+      "confidence": 95,
       "mismatch_detected": false
-    }
+    },
+    "source": "gpt-4o",
+    "model": "gpt-4o-2024-08-06",
+    "generatedAt": "2026-11-20T01:58:06.786Z"
   },
   "illegal_dumping": {
-    "source": "placeholder",
     "analysis": {
       "category": "illegal_dumping",
-      "severity": "medium",
-      "title": "Furniture and Trash Bags Dumped at Providence St Park Entrance",
-      "summary": "A mattress, a couch and several trash bags were dumped at the end of Providence St by the park entrance. The pile has been there since the weekend and is producing odor.",
-      "urgency_score": 62,
-      "impact_score": 60,
-      "priority_score": 61,
-      "reasoning": "Bulky dumped items at a park entrance attract pests and further dumping, and block part of the access path.",
-      "recommended_action": "Schedule a bulk-item pickup within the week and check for evidence to support code enforcement.",
-      "confidence": 84,
+      "severity": "high",
+      "title": "Illegal Dumping of Furniture and Trash on Providence St",
+      "summary": "A mattress, couch, and several trash bags have been illegally dumped at the end of Providence St near the park entrance. The waste has been present since the weekend and is causing a foul odor.",
+      "urgency_score": 80,
+      "impact_score": 70,
+      "priority_score": 75,
+      "reasoning": "The presence of large waste items poses a health hazard due to odor and potential attraction of pests. The location near a park entrance increases the likelihood of pedestrian exposure, especially during evening hours.",
+      "recommended_action": "Dispatch a waste management team to remove the dumped items immediately and investigate for potential responsible parties.",
+      "confidence": 95,
       "mismatch_detected": false
-    }
+    },
+    "source": "gpt-4o",
+    "model": "gpt-4o-2024-08-06",
+    "generatedAt": "2026-11-20T01:58:09.088Z"
   },
   "graffiti": {
-    "source": "placeholder",
     "analysis": {
       "category": "graffiti",
       "severity": "medium",
-      "title": "Large Graffiti on Major Taylor Blvd Underpass Wall",
-      "summary": "Spray-painted graffiti covers a large section of the underpass wall on Major Taylor Blvd. The resident notes that some of the content is offensive.",
-      "urgency_score": 55,
-      "impact_score": 50,
-      "priority_score": 53,
-      "reasoning": "Graffiti is not a safety hazard, but offensive content in a high-visibility location warrants prompt removal.",
-      "recommended_action": "Assign the graffiti removal crew; prioritize removing offensive content within 48 hours.",
-      "confidence": 86,
+      "title": "Graffiti on Underpass Wall on Major Taylor Blvd",
+      "summary": "A large graffiti has been spray-painted on the underpass wall on Major Taylor Blvd. Some of the content is reportedly offensive.",
+      "urgency_score": 50,
+      "impact_score": 40,
+      "priority_score": 45,
+      "reasoning": "The graffiti is visible to pedestrians and drivers during evening rush hour, potentially affecting community aesthetics and safety perceptions.",
+      "recommended_action": "Schedule a cleanup crew to remove the graffiti promptly, especially if it contains offensive content.",
+      "confidence": 90,
       "mismatch_detected": false
-    }
+    },
+    "source": "gpt-4o",
+    "model": "gpt-4o-2024-08-06",
+    "generatedAt": "2026-11-20T01:58:10.902Z"
   },
   "flooding": {
-    "source": "placeholder",
     "analysis": {
       "category": "flooding",
       "severity": "high",
-      "title": "Clogged Storm Drain Flooding Lincoln St Intersection",
-      "summary": "The storm drain at Lincoln St and Burncoat St is clogged, and the intersection floods ankle-deep after every rain. Vehicles are slowing to drive through the water.",
-      "urgency_score": 78,
-      "impact_score": 72,
-      "priority_score": 76,
-      "reasoning": "Recurring standing water at an intersection creates hydroplaning risk, blocks crosswalks, and will freeze in cold weather.",
-      "recommended_action": "Send a vactor truck to clear the catch basin and inspect the outlet pipe for blockage.",
-      "confidence": 80,
+      "title": "Flooding at Lincoln St and Burncoat St Intersection",
+      "summary": "The intersection at Lincoln St and Burncoat St is experiencing significant flooding due to a clogged storm drain. This causes vehicles to slow down and creates potential hazards for pedestrians.",
+      "urgency_score": 85,
+      "impact_score": 90,
+      "priority_score": 88,
+      "reasoning": "The flooding occurs during evening rush hour, affecting traffic flow and pedestrian safety. Fall rains exacerbate the issue, increasing the risk of accidents.",
+      "recommended_action": "Dispatch maintenance crew to clear the clogged storm drain immediately.",
+      "confidence": 95,
       "mismatch_detected": false
-    }
+    },
+    "source": "gpt-4o",
+    "model": "gpt-4o-2024-08-06",
+    "generatedAt": "2026-11-20T01:58:13.779Z"
   },
   "mismatch": {
-    "source": "placeholder",
     "analysis": {
       "category": "graffiti",
-      "severity": "medium",
-      "title": "Graffiti Reported as Pothole on Grafton St",
-      "summary": "The resident describes a large pothole on Grafton St, but the attached photo shows spray-painted graffiti on a wall with no visible road damage. The report has been classified from the photo.",
-      "urgency_score": 50,
-      "impact_score": 45,
-      "priority_score": 48,
-      "reasoning": "Scores reflect the graffiti shown in the photo; the described pothole could not be verified from the image.",
-      "recommended_action": "Route to the graffiti removal crew and ask the resident to confirm whether a pothole is also present.",
-      "confidence": 72,
+      "severity": "low",
+      "title": "Graffiti on Brick Wall at Grafton St",
+      "summary": "A large piece of graffiti is visible on a brick wall near the intersection of Grafton St and Hamilton St. It does not pose an immediate safety hazard but affects the area's aesthetic.",
+      "urgency_score": 20,
+      "impact_score": 10,
+      "priority_score": 15,
+      "reasoning": "The graffiti does not impact safety or traffic flow but may concern local residents or businesses.",
+      "recommended_action": "Schedule graffiti removal as part of routine maintenance.",
+      "confidence": 100,
       "mismatch_detected": true,
-      "mismatch_note": "The description claims a pothole, but the photo shows graffiti on a wall and no road surface damage."
-    }
+      "mismatch_note": "The photo shows graffiti, not a pothole as described."
+    },
+    "source": "gpt-4o",
+    "model": "gpt-4o-2024-08-06",
+    "generatedAt": "2026-11-20T01:58:15.476Z"
   }
 }
